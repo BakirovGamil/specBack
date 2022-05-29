@@ -1,0 +1,17 @@
+{
+    "mongoUrl": "mongodb://localhost:27017/spec",
+    "port" : 3000,
+    "secret" : {
+        "key": "YDepuBvjvsVcbtxPzfZ0"
+    },
+    "session" : {
+        "secret" : "AW2dVc3UQ9bPCgOptzyP",
+        "key": "SID",
+        "resave": true,
+        "saveUninitialized": true,
+        "cookie" : {
+            "httpOnly": true,
+            "maxAge": 9999999
+        }
+    }
+}
