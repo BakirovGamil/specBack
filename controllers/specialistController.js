@@ -20,7 +20,9 @@ exports.registration = async function (req, res, next) {
         await User.updateOne({_id: user._id}, {role: "specialist"});
         req.session.role = "specialist";
 
-        res.status(200).json({message: "Специалист успешно зарегестрирован"});
+        prepareObjToSend(newSpecialist);
+
+        res.status(200).json({message: "Специалист успешно зарегестрирован", body: newSpecialist});
     } catch(e) {
         console.log(e.message);
         res.sendStatus(500);

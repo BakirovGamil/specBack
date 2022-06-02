@@ -1,5 +1,7 @@
 const User = require('../scheme/user');
 const Image = require('../scheme/Image');
+const fs = require('fs');
+const path = require('path');
 
 //Можно не проверять req.session.login, т.к. без авторизации доступно только получение данных
 
@@ -14,9 +16,20 @@ exports.uploadImage = async function (req, res, next) {
 
         if(!typesOfImage.includes(type)) return res.status(400).json({message: "Неправильный тип фотки!"}); 
         if(req.session.role === "user" && type !== "avatar") return res.status(400).json({message: "Недостаточно прав загружать фотки!"}); 
-
+        
         const user = await User.findOne({login: req.session.login});
         const candidateImage = {id: Date.now(), userId: user.id, filename, mimetype, description, type};
+        
+        if(type === "avatar") {
+            const avatars = await Image.find({userId: user.id, type});
+            for(let avatar of avatars) {
+                const filePath = path.resolve(path.dirname(require.main.filename), 'images', avatar.filename);
+                await fs.promises.unlink(filePath);
+            }
+
+            await Image.deleteMany({userId: user.id, type});
+        }
+
         const image = new Image(candidateImage);
         await image.save();
 

@@ -2,7 +2,7 @@ const {Schema, model} = require('mongoose');
 
 const commentSchema = new Schema({
     id: {type: String, required: true, unique: true},
-    userId: {type: String, required: true},
+    user: {type: Schema.Types.ObjectId, required:true, ref: "User"},
     specialistId: {type: String, required: true},
     services: [String],
     rating: {type: Number, required: true},

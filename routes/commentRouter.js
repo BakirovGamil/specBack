@@ -3,6 +3,7 @@ const commentController = require('../controllers/commentController');
 const commentsRouter = express.Router();
 
 commentsRouter.get('/', commentController.getAll);
+commentsRouter.get('/getCommentStatsOfSpecialist', commentController.getCommentStatsOfSpecialist);
 
 const roles = ["user", "specialist"];
 
@@ -12,6 +13,9 @@ commentsRouter.use((req, res, next) => {
     next();
 });
 
+commentsRouter.get('/getCommentForUser', commentController.getCommentForUser);
 commentsRouter.post('/add', commentController.add);
+commentsRouter.post('/update', commentController.update);
+commentsRouter.delete('/delete', commentController.delete);
 
 module.exports = commentsRouter;
