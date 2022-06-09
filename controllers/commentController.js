@@ -53,7 +53,7 @@ exports.getCommentForUser = async function (req, res, next) {
 
 exports.add = async function (req, res, next) {
     try{
-        const {services, rating, specialistId, data} = req.body;
+        const {rating, specialistId, data} = req.body;
 
         const user = await User.findOne({login: req.session.login});
         const specialist = await Specialist.findOne({id: specialistId});
@@ -71,7 +71,6 @@ exports.add = async function (req, res, next) {
             id: Date.now(), 
             user: user._id, 
             specialistId,
-            services, 
             rating,
             data, 
             date: (new Date()).toDateString()
@@ -91,7 +90,7 @@ exports.add = async function (req, res, next) {
 
 exports.update = async function (req, res, next) {
     try{
-        const {services, rating, specialistId, data} = req.body;
+        const {rating, specialistId, data} = req.body;
 
         const user = await User.findOne({login: req.session.login});
         const specialist = await Specialist.findOne({id: specialistId});
@@ -103,7 +102,7 @@ exports.update = async function (req, res, next) {
         if(rating < 1 || rating > 5 ) return res.status(400).json({message: "Некорректно указан рейтинг!"});
         if(trimmedData.length <= 20) return res.status(400).json({message: "Длина отзыва должна быть больше 20 символов"});
         
-        await Comment.updateOne({user: user._id, specialistId}, {services, rating, data});
+        await Comment.updateOne({user: user._id, specialistId}, {rating, data});
         const comment = await Comment.findOne({user: user._id, specialistId}).populate("user").lean();
         prepareObjToSend(comment);
 

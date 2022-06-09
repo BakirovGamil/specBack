@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const conf = require('../config.json');
+const Chat = require('../scheme/chat');
 const User = require('../scheme/user');
 
 exports.registration = async function (req, res, next) {
@@ -13,9 +14,13 @@ exports.registration = async function (req, res, next) {
         if(!checkBodyRegistration(req, res)) return;
 
         const hashPassword = crypto.createHmac('sha256', conf.secret.key).update(password).digest('hex');
-        const newCandidate = {id: Date.now(), firstName, lastName, middleName, login, password: hashPassword, phoneNumber, role: "user", date: (new Date()).toDateString()};
+        const newCandidate = {id: Date.now(), firstName, lastName, middleName, login, password: hashPassword, phoneNumber, role: "user", isBanned: false, date: (new Date()).toDateString()};
         const newUser = new User(newCandidate);
         await newUser.save();
+
+        const admin = await User.findOne({id: "1"}); 
+        const user = await User.findOne({id: newCandidate.id});
+        await Chat.create({id: Date.now(), firstUser: admin._id, secondUser: user._id})
 
         const resUser = newCandidate;
         prepareObjToSend(resUser);
@@ -35,6 +40,7 @@ exports.login = async function (req, res, next) {
 
         if(!checkBodyLogin(req, res)) return;
         if(!candidate) return res.status(400).json({message: "Неверный логин или пароль"});
+        if(candidate.isBanned) return res.status(400).json({message: "Аккаунт забанен"});
 
         req.session.isAuth = true;
         req.session.login = login;
@@ -68,6 +74,54 @@ exports.getCurrentUser = async function(req, res) {
         prepareObjToSend(currentUser);
 
         res.status(200).json(currentUser);
+    } catch (e) {
+        console.log(e.message);
+        res.sendStatus(500);
+    }
+}
+
+exports.updateUser = async function(req, res) {
+    try {
+        if(!req.session.login) return res.status(401).json({message: "Не авторизован"});
+
+        const {id, lastName, firstName, middleName} = req.body;
+        try {
+            checkName(firstName);
+            checkName(lastName);
+            if(middleName) checkName(middleName);
+        } catch (e) {
+            return res.status(400).json({message: e.message});
+        }
+        
+        const shouldUpdateUser = await User.findOne({id});
+
+        if(shouldUpdateUser.login !== req.session.login) return res.status(403).json({message: "Недостаточно прав!"});
+
+        await User.updateOne(shouldUpdateUser, {lastName, firstName, middleName});
+        const updatedUser = await User.findOne({id}).lean();
+        prepareObjToSend(updatedUser);
+
+        res.status(200).json(updatedUser);
+    } catch (e) {
+        console.log(e.message);
+        res.sendStatus(500);
+    }
+}
+
+exports.updateIsBanned = async function(req, res) {
+    try {
+        if(!req.session.login) return res.status(401).json({message: "Не авторизован"});
+        if(req.session.role !== "admin") return res.status(403).json({message: "Недостаточно прав!"});
+
+        const {id, isBanned} = req.body;
+        
+        const shouldUpdateUser = await User.findOne({id});
+
+        await User.updateOne(shouldUpdateUser, {isBanned});
+        const updatedUser = await User.findOne({id}).lean();
+        prepareObjToSend(updatedUser);
+
+        res.status(200).json(updatedUser);
     } catch (e) {
         console.log(e.message);
         res.sendStatus(500);
@@ -119,7 +173,7 @@ checkBodyLogin = function (req, res) {
     }
 };
 
-const checkName = name => {
+const checkName = (name) => {
     const regExp =  /^[а-яА-ЯёЁ-]+$/;
     const isCyrillic = regExp.test(name);
     const lengthOfName = name.length;

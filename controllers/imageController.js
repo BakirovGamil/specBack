@@ -9,6 +9,7 @@ const typesOfImage = ["avatar", "gallery", "passport"];
 
 exports.uploadImage = async function (req, res, next) {
     try{
+        console.log(req.body)
         if(!req.file) return res.status(400).json({message: "Не удалось загрузить фото! Убедитесь, что выбран правильный формат изображения!"});
 
         const {filename, mimetype} = req.file;
@@ -48,6 +49,44 @@ exports.getAll = async function (req, res, next) {
         prepareObjToSend(images);
 
         res.status(200).json(images);
+    } catch(e) {
+        console.log(e.message);
+        res.sendStatus(500);
+    }
+};
+
+exports.delete = async function (req, res, next) {
+    try{
+        const {id} = req.body;
+
+        const user = await User.findOne({login: req.session.login});
+        const image = await Image.findOne({id});
+
+        if(image.userId !== user.id) return res.status(400).json({message: "Отказано в доступе"});
+
+        const filePath = path.resolve(path.dirname(require.main.filename), 'images', image.filename);
+        await fs.promises.unlink(filePath);
+        await Image.deleteOne(image);
+
+        res.status(200).json({message: "Фотка успешно удалена"});
+    } catch(e) {
+        console.log(e.message);
+        res.sendStatus(500);
+    }
+};
+
+exports.updateDescription = async function (req, res, next) {
+    try{
+        const {id, description} = req.body;
+        
+        const user = await User.findOne({login: req.session.login});
+        const image = await Image.findOne({id});
+
+        if(image.userId !== user.id) return res.status(400).json({message: "Отказано в доступе"});
+
+        await Image.updateOne(image, {description});
+
+        res.status(200).json({message: "Фотка успешно удалена"});
     } catch(e) {
         console.log(e.message);
         res.sendStatus(500);

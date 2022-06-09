@@ -5,10 +5,10 @@ const commentsRouter = express.Router();
 commentsRouter.get('/', commentController.getAll);
 commentsRouter.get('/getCommentStatsOfSpecialist', commentController.getCommentStatsOfSpecialist);
 
-const roles = ["user", "specialist"];
+const roles = ["user", "specialist", 'admin'];
 
 commentsRouter.use((req, res, next) => {
-    if(!roles.includes(req.session.role)) return res.status(403).json({message: "Не достаточно прав!"});
+    if(!roles.includes(req.session.role)) return res.status(403).json({message: "Недостаточно прав!"});
 
     next();
 });

@@ -11,9 +11,11 @@ const {Schema, model} = require('mongoose');
 
 const specialistSchema = new Schema({
     id: {type: String, required:true, unique: true},
-    user: {type: Schema.Types.ObjectId, required:true, unique: true, ref: "User"},
+    user: {type: Schema.Types.ObjectId, required: true, unique: true, ref: "User"},
     about: {type: String, required: true},
-    experience: [String]
+    experience: [String],
+    professions: [{type: Schema.Types.ObjectId, required: true, ref: "Profession"}],
+    isVerify: {type: Boolean, required: true}
 });
 
 

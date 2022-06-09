@@ -9,6 +9,7 @@ const userScheme = new Schema({
     password: {type: String, required: true},
     phoneNumber: {type: String, required: true},
     role: {type: String, required: true},
+    isBanned: {type: Boolean, required: true},
     date: {type: String, required: true}
 });
 

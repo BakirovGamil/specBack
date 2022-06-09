@@ -25,13 +25,15 @@ const upload = multer({ storage: storage, fileFilter: imageFilter });
 
 imageRouter.get('/', imageController.getAll);
 
-//Даем доступ к api ниже только если это пользователь или специалист
+const roles = ['user', 'specialist', 'admin']
 imageRouter.use((req, res, next) => {
-    if(!(req.session.role === "user" || req.session.role === "specialist")) return res.status(403).json({message: "Не достаточно прав!"});
+    if(!roles.includes(req.session.role)) return res.status(403).json({message: "Недостаточно прав!"});
 
     next();
 });
 
 imageRouter.post('/uploadImage', upload.single('image'), imageController.uploadImage);
+imageRouter.delete('/delete', imageController.delete);
+imageRouter.post('/updateDescription', imageController.updateDescription);
 
 module.exports = imageRouter;
