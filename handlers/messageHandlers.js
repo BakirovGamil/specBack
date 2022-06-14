@@ -33,9 +33,6 @@ module.exports = (io, socket) => {
         }
     }
   
-    // обрабатываем добавление сообщения
-    // функция принимает объект сообщения
-    //{content}
     const addMessage = async (message) => {
         try {
             const {content} = message;
@@ -43,25 +40,15 @@ module.exports = (io, socket) => {
             const user = await User.findOne({login: req.session.login});
             const newMessage = {id: Date.now(), sender: user._id, chatId: socket.roomId, content, isRead: false, date: Date.now()};
             await Message.create(newMessage);
-            // выполняем запрос на получение сообщений
+
             getMessages()
         } catch(e) {
             console.log(e)
         }
     }
   
-    // обрабатываем удаление сообщение
-    // функция принимает id сообщения
-    // const removeMessage = (messageId) => {
-    //     db.get('messages').remove({ messageId }).write()
-    
-    //     getMessages()
-    // }
-  
-    // регистрируем обработчики
     socket.on('message:get', getMessages)
     socket.on('message:add', addMessage)
-    // socket.on('message:remove', removeMessage)
 }
 
 function prepareObjToSend(object) {   // Удаляет все опасные и ненужные свойства

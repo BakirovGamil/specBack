@@ -9,6 +9,7 @@ const imageRouter = require('./routes/imageRouter');
 const serviceRouter = require('./routes/serviceRouter');
 const commentRouter = require('./routes/commentRouter');
 const favoriteRouter = require('./routes/favoriteRouter');
+const professionRouter = require('./routes/professionRouter');
 const subscriptionRouter = require('./routes/subscriptionRouter');
 const authorizationController = require('./controllers/autorizationController');
 const chatHandlers = require('./lib/chatHandlers');
@@ -17,15 +18,12 @@ const { Server } = require("socket.io");
 const registerMessageHandlers = require('./handlers/messageHandlers');
 
 const app = express()
-
-const cors = require('cors');
-const professionRouter = require('./routes/professionRouter');
-app.use(cors());
-
 //Парсерсы тела запроса
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+const cors = require('cors');
+app.use(cors());
 //Сессия
 const sessionMiddleware = session({
     secret: conf.session.secret,

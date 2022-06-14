@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const conf = require('../config.json');
 const Chat = require('../scheme/chat');
 const User = require('../scheme/user');
+const { v4: uuidv4 } = require('uuid');
 
 exports.registration = async function (req, res, next) {
     try{
@@ -14,13 +15,24 @@ exports.registration = async function (req, res, next) {
         if(!checkBodyRegistration(req, res)) return;
 
         const hashPassword = crypto.createHmac('sha256', conf.secret.key).update(password).digest('hex');
-        const newCandidate = {id: Date.now(), firstName, lastName, middleName, login, password: hashPassword, phoneNumber, role: "user", isBanned: false, date: (new Date()).toDateString()};
+        const newCandidate = {
+            id: uuidv4(), 
+            firstName, 
+            lastName, 
+            middleName, 
+            login, 
+            password: hashPassword, 
+            phoneNumber, 
+            role: "user", 
+            isBanned: false, 
+            date: (new Date()).toDateString()
+        };
         const newUser = new User(newCandidate);
         await newUser.save();
 
         const admin = await User.findOne({id: "1"}); 
         const user = await User.findOne({id: newCandidate.id});
-        await Chat.create({id: Date.now(), firstUser: admin._id, secondUser: user._id})
+        await Chat.create({id: uuidv4(), firstUser: admin._id, secondUser: user._id})
 
         const resUser = newCandidate;
         prepareObjToSend(resUser);

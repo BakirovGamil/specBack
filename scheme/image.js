@@ -6,7 +6,8 @@ const imageSchema = new Schema({
     filename: {type: String, unique: true, required: true},
     mimetype: {type: String, required: true},
     description: {type: String},
-    type: {type: String, required: true} // "avatar", "passport", "gallery"
+    type: {type: String, required: true} // "avatar", "gallery"
 });
 
 module.exports = model("Image", imageSchema);
+
