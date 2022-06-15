@@ -1,5 +1,5 @@
 const User = require('../scheme/user');
-const Image = require('../scheme/Image');
+const Image = require('../scheme/image');
 const fs = require('fs');
 const path = require('path');
 
