@@ -33,10 +33,10 @@ const sessionMiddleware = session({
     store: mongoStore.create({mongoUrl: conf.mongoUrl})
 });
 app.use(sessionMiddleware);
-app.use((req, res, next) => {
-    console.log(req.url);
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log(req.url);
+//     next();
+// });
 //Статика
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.static(path.join(__dirname, 'images')));

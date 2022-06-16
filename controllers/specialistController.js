@@ -1,6 +1,6 @@
 const Specialist = require('../scheme/specialist');
 const User = require('../scheme/user');
-const Image = require('../scheme/Image');
+const Image = require('../scheme/image');
 
 //Можно не проверять req.session.login, т.к. без авторизации доступно только получение данных
 
