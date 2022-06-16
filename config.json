@@ -6,6 +6,7 @@
     },
     "session" : {
         "secret" : "AW2dVc3UQ9bPCgOptzyP",
+        "domain": "bakirov-spec.ru",
         "key": "SID",
         "resave": true,
         "saveUninitialized": true,
